@@ -1,0 +1,49 @@
+.trex {
+    position: fixed;
+    bottom: 20px;
+    width: 68px;
+    height: 68px;
+    background-image: url('trex.png');
+    background-size: 408px 68px; /* 6 frames x 68px */
+    z-index: 1000;
+    animation: 
+        walk-sprite 0.6s steps(6) infinite,
+        move-right 15s linear infinite;
+}
+
+@keyframes walk-sprite {
+    from { background-position: 0 0; }
+    to { background-position: -408px 0; }
+}
+
+@keyframes move-right {
+    0% { 
+        transform: translateX(-100px) scaleX(1);
+    }
+    45% { 
+        transform: translateX(calc(50vw - 150px)) scaleX(1);
+    }
+    50% {
+        transform: translateX(calc(50vw - 150px)) scaleX(-1);
+    }
+    95% {
+        transform: translateX(-100px) scaleX(-1);
+    }
+    100% { 
+        transform: translateX(-100px) scaleX(1);
+    }
+}
+
+.volcano {
+    position: fixed;
+    bottom: 10px;
+    left: calc(50vw - 100px);
+    font-size: 60px;
+    z-index: 999;
+    animation: volcano-glow 2s infinite ease-in-out;
+}
+
+@keyframes volcano-glow {
+    0%, 100% { filter: brightness(1); }
+    50% { filter: brightness(1.2); }
+} 
