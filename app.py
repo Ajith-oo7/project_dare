@@ -84,9 +84,9 @@ def hash_password(password):
 def verify_password(password, hashed):
     return bcrypt.checkpw(password.encode('utf-8'), hashed)
 
-# Google OAuth2 Configuration
-GOOGLE_CLIENT_ID = st.secrets["GOOGLE_CLIENT_ID"]
-GOOGLE_CLIENT_SECRET = st.secrets["GOOGLE_CLIENT_SECRET"]
+# Comment out or remove Google OAuth code
+# GOOGLE_CLIENT_ID = st.secrets["GOOGLE_CLIENT_ID"]
+# GOOGLE_CLIENT_SECRET = st.secrets["GOOGLE_CLIENT_SECRET"]
 
 def init_google_auth():
     flow = Flow.from_client_secrets_file(
@@ -116,7 +116,7 @@ def main():
 def show_login_page():
     st.title("🎯 DareMe")
     
-    tab1, tab2, tab3 = st.tabs(["Login", "Register", "Login with Google"])
+    tab1, tab2 = st.tabs(["Login", "Register"])
     
     with tab1:
         username = st.text_input("Username or Email", key="login_username")
@@ -146,13 +146,6 @@ def show_login_page():
                 st.success("Registration successful! Please login.")
             else:
                 st.error("Username or email already exists!")
-    
-    with tab3:
-        if st.button("Sign in with Google"):
-            flow = init_google_auth()
-            authorization_url, state = flow.authorization_url()
-            st.markdown(f'<a href="{authorization_url}" target="_self">Click here to sign in with Google</a>', 
-                       unsafe_allow_html=True)
 
 def show_main_app():
     # Add logout button in sidebar
