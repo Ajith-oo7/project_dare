@@ -3,11 +3,12 @@ from datetime import datetime
 import bcrypt
 import os
 from pathlib import Path
+from dotenv import load_dotenv
+
+load_dotenv()  # Load environment variables
 
 def get_db_path():
-    if Path("app_collected_data.db").exists():
-        return "app_collected_data.db"
-    return ".streamlit/app_collected_data.db"
+    return os.getenv('DB_PATH', 'app_collected_data.db')
 
 def init_db():
     conn = sqlite3.connect(get_db_path())
