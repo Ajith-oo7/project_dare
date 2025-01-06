@@ -10,9 +10,6 @@ import requests
 import json
 from database import init_db, create_user, authenticate_user, check_username_exists
 from pages import show_home_page, show_search_page, show_add_post, show_stream_page, show_profile_page
-from google.oauth2 import id_token
-from google.auth.transport import requests
-from google_auth_oauthlib.flow import Flow
 
 # Configure Streamlit page
 st.set_page_config(
@@ -83,26 +80,6 @@ def hash_password(password):
 
 def verify_password(password, hashed):
     return bcrypt.checkpw(password.encode('utf-8'), hashed)
-
-# Comment out or remove Google OAuth code
-# GOOGLE_CLIENT_ID = st.secrets["GOOGLE_CLIENT_ID"]
-# GOOGLE_CLIENT_SECRET = st.secrets["GOOGLE_CLIENT_SECRET"]
-
-def init_google_auth():
-    flow = Flow.from_client_secrets_file(
-        'client_secrets.json',
-        scopes=['openid', 'email', 'profile'],
-        redirect_uri=st.secrets["OAUTH_REDIRECT_URI"]
-    )
-    return flow
-
-def verify_google_token(token):
-    try:
-        idinfo = id_token.verify_oauth2_token(
-            token, requests.Request(), GOOGLE_CLIENT_ID)
-        return idinfo
-    except ValueError:
-        return None
 
 # Main App with Enhanced UI
 def main():
