@@ -4,6 +4,7 @@ import pandas as pd
 from database import create_post, add_comment, update_privacy, delete_post, toggle_archive_post, add_trend, has_user_trended
 import os
 import time
+import tempfile
 
 # Implementation of individual pages
 def show_home_page():
@@ -268,5 +269,8 @@ def show_posts(posts, archived=False):
                     delete_post(post['post_id'])
                     st.success("Post deleted!")
                     st.rerun()
+
+def get_upload_path():
+    return tempfile.gettempdir()
 
 # Implement other page functions similarly... 

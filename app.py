@@ -10,6 +10,9 @@ import requests
 import json
 from database import init_db, create_user, authenticate_user
 from pages import show_home_page, show_search_page, show_add_post, show_stream_page, show_profile_page
+from google.oauth2 import id_token
+from google.auth.transport import requests
+from google_auth_oauthlib.flow import Flow
 
 # Configure Streamlit page
 st.set_page_config(
@@ -81,6 +84,26 @@ def hash_password(password):
 def verify_password(password, hashed):
     return bcrypt.checkpw(password.encode('utf-8'), hashed)
 
+# Google OAuth2 Configuration
+GOOGLE_CLIENT_ID = "your-client-id.apps.googleusercontent.com"
+GOOGLE_CLIENT_SECRET = "your-client-secret"
+
+def init_google_auth():
+    flow = Flow.from_client_secrets_file(
+        'client_secrets.json',
+        scopes=['openid', 'email', 'profile'],
+        redirect_uri='http://localhost:8501/callback'
+    )
+    return flow
+
+def verify_google_token(token):
+    try:
+        idinfo = id_token.verify_oauth2_token(
+            token, requests.Request(), GOOGLE_CLIENT_ID)
+        return idinfo
+    except ValueError:
+        return None
+
 # Main App with Enhanced UI
 def main():
     if not os.path.exists("uploads"):
@@ -93,10 +116,10 @@ def main():
 def show_login_page():
     st.title("🎯 DareMe")
     
-    tab1, tab2 = st.tabs(["Login", "Register"])
+    tab1, tab2, tab3 = st.tabs(["Login", "Register", "Login with Google"])
     
     with tab1:
-        username = st.text_input("Username", key="login_username")
+        username = st.text_input("Username or Email", key="login_username")
         password = st.text_input("Password", type="password", key="login_password")
         
         if st.button("Login"):
@@ -111,6 +134,7 @@ def show_login_page():
     
     with tab2:
         new_username = st.text_input("Choose Username", key="reg_username")
+        email = st.text_input("Email", key="reg_email")
         new_password = st.text_input("Choose Password", type="password", key="reg_password")
         confirm_password = st.text_input("Confirm Password", type="password")
         bio = st.text_area("Bio (optional)")
@@ -118,10 +142,17 @@ def show_login_page():
         if st.button("Register"):
             if new_password != confirm_password:
                 st.error("Passwords don't match!")
-            elif create_user(new_username, new_password, bio):
+            elif create_user(new_username, email, new_password, bio):
                 st.success("Registration successful! Please login.")
             else:
-                st.error("Username already exists!")
+                st.error("Username or email already exists!")
+    
+    with tab3:
+        if st.button("Sign in with Google"):
+            flow = init_google_auth()
+            authorization_url, state = flow.authorization_url()
+            st.markdown(f'<a href="{authorization_url}" target="_self">Click here to sign in with Google</a>', 
+                       unsafe_allow_html=True)
 
 def show_main_app():
     # Add logout button in sidebar

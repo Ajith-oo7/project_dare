@@ -2,19 +2,28 @@ import sqlite3
 from datetime import datetime
 import bcrypt
 import os
+from pathlib import Path
+
+def get_db_path():
+    if Path("app_collected_data.db").exists():
+        return "app_collected_data.db"
+    return ".streamlit/app_collected_data.db"
 
 def init_db():
-    conn = sqlite3.connect('app_collected_data.db')
+    conn = sqlite3.connect(get_db_path())
     c = conn.cursor()
     
     c.execute('''CREATE TABLE IF NOT EXISTS users
                  (user_id INTEGER PRIMARY KEY,
                   username TEXT UNIQUE,
+                  email TEXT UNIQUE,
                   password_hash BLOB,
                   bio TEXT,
                   profile_pic TEXT,
                   is_private BOOLEAN DEFAULT 0,
-                  join_date TEXT)''')
+                  join_date TEXT,
+                  oauth_provider TEXT,
+                  oauth_id TEXT)''')
                   
     c.execute('''CREATE TABLE IF NOT EXISTS posts
                  (post_id INTEGER PRIMARY KEY,
@@ -51,7 +60,7 @@ def init_db():
     conn.close()
 
 def update_privacy(user_id, is_private):
-    conn = sqlite3.connect('app_collected_data.db')
+    conn = sqlite3.connect(get_db_path())
     c = conn.cursor()
     c.execute("UPDATE users SET is_private = ? WHERE user_id = ?", 
              (is_private, user_id))
@@ -59,7 +68,7 @@ def update_privacy(user_id, is_private):
     conn.close()
 
 def create_post(user_id, media_path, caption):
-    conn = sqlite3.connect('app_collected_data.db')
+    conn = sqlite3.connect(get_db_path())
     c = conn.cursor()
     
     # Determine media type from file extension
@@ -75,7 +84,7 @@ def create_post(user_id, media_path, caption):
     conn.close()
 
 def add_comment(post_id, user_id, comment):
-    conn = sqlite3.connect('app_collected_data.db')
+    conn = sqlite3.connect(get_db_path())
     c = conn.cursor()
     c.execute("""INSERT INTO comments 
                  (post_id, user_id, comment, created_date)
@@ -85,16 +94,22 @@ def add_comment(post_id, user_id, comment):
     conn.commit()
     conn.close()
 
-def create_user(username, password, bio=""):
-    conn = sqlite3.connect('app_collected_data.db')
+def create_user(username, email, password=None, bio="", oauth_provider=None, oauth_id=None):
+    conn = sqlite3.connect(get_db_path())
     c = conn.cursor()
     try:
-        password_hash = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
+        if password:
+            password_hash = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
+        else:
+            password_hash = None
+            
         c.execute("""INSERT INTO users 
-                    (username, password_hash, bio, is_private, join_date) 
-                    VALUES (?, ?, ?, ?, ?)""",
-                 (username, password_hash, bio, False, 
-                  datetime.now().strftime("%Y-%m-%d %H:%M:%S")))
+                    (username, email, password_hash, bio, is_private, join_date, 
+                     oauth_provider, oauth_id) 
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?)""",
+                 (username, email, password_hash, bio, False, 
+                  datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                  oauth_provider, oauth_id))
         conn.commit()
         return True
     except sqlite3.IntegrityError:
@@ -103,7 +118,7 @@ def create_user(username, password, bio=""):
         conn.close()
 
 def authenticate_user(username, password):
-    conn = sqlite3.connect('app_collected_data.db')
+    conn = sqlite3.connect(get_db_path())
     c = conn.cursor()
     c.execute("SELECT user_id, password_hash FROM users WHERE username = ?", (username,))
     result = c.fetchone()
@@ -114,7 +129,7 @@ def authenticate_user(username, password):
     return None 
 
 def delete_post(post_id):
-    conn = sqlite3.connect('app_collected_data.db')
+    conn = sqlite3.connect(get_db_path())
     c = conn.cursor()
     
     try:
@@ -140,7 +155,7 @@ def delete_post(post_id):
         conn.close()
 
 def toggle_archive_post(post_id, archive=True):
-    conn = sqlite3.connect('app_collected_data.db')
+    conn = sqlite3.connect(get_db_path())
     c = conn.cursor()
     c.execute("UPDATE posts SET is_archived = ? WHERE post_id = ?", 
              (archive, post_id))
@@ -148,7 +163,7 @@ def toggle_archive_post(post_id, archive=True):
     conn.close() 
 
 def has_user_trended(post_id, user_id):
-    conn = sqlite3.connect('app_collected_data.db')
+    conn = sqlite3.connect(get_db_path())
     c = conn.cursor()
     c.execute("""SELECT 1 FROM trends 
                  WHERE post_id = ? AND user_id = ?""", 
@@ -158,7 +173,7 @@ def has_user_trended(post_id, user_id):
     return result
 
 def add_trend(post_id, user_id, is_uptrend):
-    conn = sqlite3.connect('app_collected_data.db')
+    conn = sqlite3.connect(get_db_path())
     c = conn.cursor()
     try:
         # Add the trend vote
