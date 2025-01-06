@@ -85,8 +85,8 @@ def verify_password(password, hashed):
     return bcrypt.checkpw(password.encode('utf-8'), hashed)
 
 # Google OAuth2 Configuration
-GOOGLE_CLIENT_ID = "your-client-id.apps.googleusercontent.com"
-GOOGLE_CLIENT_SECRET = "your-client-secret"
+GOOGLE_CLIENT_ID = "YOUR_ACTUAL_CLIENT_ID.apps.googleusercontent.com"
+GOOGLE_CLIENT_SECRET = "YOUR_ACTUAL_CLIENT_SECRET"
 
 def init_google_auth():
     flow = Flow.from_client_secrets_file(
