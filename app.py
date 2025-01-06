@@ -8,7 +8,7 @@ from streamlit_option_menu import option_menu
 from streamlit_lottie import st_lottie
 import requests
 import json
-from database import init_db, create_user, authenticate_user
+from database import init_db, create_user, authenticate_user, check_username_exists
 from pages import show_home_page, show_search_page, show_add_post, show_stream_page, show_profile_page
 from google.oauth2 import id_token
 from google.auth.transport import requests
@@ -134,18 +134,30 @@ def show_login_page():
     
     with tab2:
         new_username = st.text_input("Choose Username", key="reg_username")
+        
+        # Add real-time username check
+        if new_username:
+            if check_username_exists(new_username):
+                st.error("Username already taken!")
+                can_register = False
+            else:
+                st.success("Username available!")
+                can_register = True
+        
         email = st.text_input("Email", key="reg_email")
         new_password = st.text_input("Choose Password", type="password", key="reg_password")
         confirm_password = st.text_input("Confirm Password", type="password")
         bio = st.text_area("Bio (optional)")
         
         if st.button("Register"):
-            if new_password != confirm_password:
+            if not can_register:
+                st.error("Please choose a different username!")
+            elif new_password != confirm_password:
                 st.error("Passwords don't match!")
             elif create_user(new_username, email, new_password, bio):
                 st.success("Registration successful! Please login.")
             else:
-                st.error("Username or email already exists!")
+                st.error("Email already exists!")
 
 def show_main_app():
     # Add logout button in sidebar

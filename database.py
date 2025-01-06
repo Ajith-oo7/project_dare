@@ -204,3 +204,11 @@ def add_trend(post_id, user_id, is_uptrend):
         pass  # User already voted
     finally:
         conn.close() 
+
+def check_username_exists(username):
+    conn = sqlite3.connect(get_db_path())
+    c = conn.cursor()
+    c.execute("SELECT 1 FROM users WHERE username = ?", (username,))
+    exists = c.fetchone() is not None
+    conn.close()
+    return exists 
