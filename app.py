@@ -21,7 +21,46 @@ st.set_page_config(
     layout="wide"
 )
 
-# Rest of your app.py code...
+def main():
+    if not os.path.exists("uploads"):
+        os.makedirs("uploads")
+    if 'user_id' not in st.session_state:
+        show_login_page()
+    else:
+        show_main_app()
+
+def show_login_page():
+    st.title("🎯 DareMe")
+    
+    tab1, tab2 = st.tabs(["Login", "Register"])
+    
+    with tab1:
+        username = st.text_input("Username or Email", key="login_username")
+        password = st.text_input("Password", type="password", key="login_password")
+        
+        if st.button("Login"):
+            user_id = authenticate_user(username, password)
+            if user_id:
+                st.session_state.user_id = user_id
+                st.session_state.username = username
+                st.success("Login successful!")
+                st.rerun()
+            else:
+                st.error("Invalid credentials!")
+    
+    with tab2:
+        new_username = st.text_input("Choose Username", key="reg_username")
+        email = st.text_input("Email", key="reg_email")
+        new_password = st.text_input("Choose Password", type="password", key="reg_password")
+        confirm_password = st.text_input("Confirm Password", type="password")
+        
+        if st.button("Register"):
+            if new_password != confirm_password:
+                st.error("Passwords don't match!")
+            elif create_user(new_username, email, new_password):
+                st.success("Registration successful! Please login.")
+            else:
+                st.error("Username or email already exists!")
 
 def show_main_app():
     # Simplified menu first
@@ -38,8 +77,6 @@ def show_main_app():
         show_messages_page()
     elif selected == "Profile":
         show_profile_page()
-
-# Add implementation for each page function...
 
 if __name__ == "__main__":
     init_db()
