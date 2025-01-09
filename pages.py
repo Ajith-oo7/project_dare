@@ -364,46 +364,95 @@ def get_upload_path():
     return tempfile.gettempdir()
 
 def show_messages_page():
-    st.title("Messages")
-    
-    # Initialize chat state if not exists
+    st.markdown("""
+        <style>
+        /* iOS-style message bubbles */
+        .message-bubble-right {
+            background-color: #007AFF;
+            color: white;
+            padding: 10px 15px;
+            border-radius: 20px;
+            margin: 5px;
+            max-width: 70%;
+            float: right;
+            clear: both;
+        }
+        
+        .message-bubble-left {
+            background-color: #E9E9EB;
+            color: black;
+            padding: 10px 15px;
+            border-radius: 20px;
+            margin: 5px;
+            max-width: 70%;
+            float: left;
+            clear: both;
+        }
+        
+        .message-container {
+            padding: 10px;
+            overflow-y: auto;
+            height: 60vh;
+            background-color: white;
+        }
+        
+        .message-input {
+            border-radius: 20px;
+            border: 1px solid #E9E9EB;
+            padding: 10px 15px;
+            margin: 10px 0;
+            width: 100%;
+        }
+        
+        .send-button {
+            background-color: #007AFF;
+            color: white;
+            border-radius: 20px;
+            padding: 10px 20px;
+            border: none;
+            cursor: pointer;
+        }
+        
+        .chat-header {
+            padding: 10px;
+            border-bottom: 1px solid #E9E9EB;
+            font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+        </style>
+    """, unsafe_allow_html=True)
+
+    # Initialize chat state
     if 'active_chat' not in st.session_state:
         st.session_state.active_chat = None
         st.session_state.chat_username = None
-        st.session_state.messages = []
-
-    # Add search bar for users
-    search_user = st.text_input("Search users to message", key="message_search")
-    
-    # Get conversations
-    conn = sqlite3.connect(get_db_path())
-    conversations = pd.read_sql_query("""
-        SELECT DISTINCT 
-            CASE 
-                WHEN m.sender_id = ? THEN m.receiver_id
-                ELSE m.sender_id 
-            END as other_user_id,
-            u.username,
-            u.profile_pic,
-            MAX(m.created_date) as last_message_date,
-            SUM(CASE WHEN m.is_read = 0 AND m.receiver_id = ? THEN 1 ELSE 0 END) as unread_count
-        FROM messages m
-        JOIN users u ON u.user_id = 
-            CASE 
-                WHEN m.sender_id = ? THEN m.receiver_id
-                ELSE m.sender_id 
-            END
-        WHERE m.sender_id = ? OR m.receiver_id = ?
-        GROUP BY other_user_id
-        ORDER BY last_message_date DESC
-    """, conn, params=(st.session_state.user_id,)*5)
 
     # Chat interface
-    chat_area, message_area = st.container(), st.container()
-
-    # Show conversations in sidebar-like layout
+    chat_area = st.container()
+    
+    # Show conversations in sidebar
     with st.sidebar:
-        st.subheader("Conversations")
+        st.markdown("<h3 style='font-family: -apple-system;'>Messages</h3>", unsafe_allow_html=True)
+        conversations = pd.read_sql_query("""
+            SELECT DISTINCT 
+                CASE 
+                    WHEN m.sender_id = ? THEN m.receiver_id
+                    ELSE m.sender_id 
+                END as other_user_id,
+                u.username,
+                u.profile_pic,
+                MAX(m.created_date) as last_message_date,
+                SUM(CASE WHEN m.is_read = 0 AND m.receiver_id = ? THEN 1 ELSE 0 END) as unread_count
+            FROM messages m
+            JOIN users u ON u.user_id = 
+                CASE 
+                    WHEN m.sender_id = ? THEN m.receiver_id
+                    ELSE m.sender_id 
+                END
+            WHERE m.sender_id = ? OR m.receiver_id = ?
+            GROUP BY other_user_id
+            ORDER BY last_message_date DESC
+        """, get_db_path(), params=(st.session_state.user_id,)*5)
+
         for _, conv in conversations.iterrows():
             col1, col2 = st.columns([1, 4])
             with col1:
@@ -421,53 +470,41 @@ def show_messages_page():
     # Show active chat
     if st.session_state.active_chat:
         with chat_area:
-            st.subheader(f"Chat with {st.session_state.chat_username}")
+            st.markdown(f"""
+                <div class='chat-header'>
+                    <h3 style='margin: 0;'>{st.session_state.chat_username}</h3>
+                </div>
+            """, unsafe_allow_html=True)
             
-            # Get messages
             messages = pd.read_sql_query("""
                 SELECT m.*, u.username 
                 FROM messages m
                 JOIN users u ON m.sender_id = u.user_id
                 WHERE (sender_id = ? AND receiver_id = ?)
                 OR (sender_id = ? AND receiver_id = ?)
-                ORDER BY m.created_date DESC
-                LIMIT 50
-            """, conn, params=(st.session_state.user_id, st.session_state.active_chat,
-                             st.session_state.active_chat, st.session_state.user_id))
+                ORDER BY m.created_date
+            """, get_db_path(), params=(st.session_state.user_id, st.session_state.active_chat,
+                                      st.session_state.active_chat, st.session_state.user_id))
             
-            # Show messages
-            for _, msg in messages.iloc[::-1].iterrows():
+            st.markdown("<div class='message-container'>", unsafe_allow_html=True)
+            for _, msg in messages.iterrows():
                 is_me = msg['sender_id'] == st.session_state.user_id
-                st.markdown(
-                    f"""<div style='text-align: {'right' if is_me else 'left'}'>
-                        <small>{msg['username']}</small><br>
-                        <div style='background: {'#DCF8C6' if is_me else '#E8E8E8'}; 
-                                    display: inline-block; padding: 10px; 
-                                    border-radius: 10px; margin: 5px;
-                                    max-width: 70%;'>
-                            {msg['content']}
-                        </div>
-                    </div>""", 
-                    unsafe_allow_html=True
-                )
-
-        # Message input at bottom
-        with message_area:
+                st.markdown(f"""
+                    <div class='message-bubble-{'right' if is_me else 'left'}'>
+                        {msg['content']}
+                    </div>
+                """, unsafe_allow_html=True)
+            st.markdown("</div>", unsafe_allow_html=True)
+            
+            # Message input
             col1, col2 = st.columns([4, 1])
             with col1:
-                message = st.text_input("Message", key="message_input")
+                message = st.text_input("", placeholder="iMessage", key="message_input")
             with col2:
                 if st.button("Send", key="send_button"):
                     if message.strip():
                         send_message(st.session_state.user_id, st.session_state.active_chat, message)
                         st.rerun()
-
-    conn.close()
-
-    # Auto-refresh
-    if st.session_state.active_chat:
-        time.sleep(1)
-        st.rerun()
 
 def show_stories_page():
     st.title("Stories")
