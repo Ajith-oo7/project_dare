@@ -1,0 +1,110 @@
+Here are the updated requirements for the **DareYou Web App** with adjustments made for web functionalities:
+
+### **1. General Requirements**
+- **Technology Stack:**
+  - Frontend: **React** or **Next.js** for efficient rendering and faster load times.
+  - Backend: **Node.js** with **Express** or **Firebase** (for real-time features).
+  - Database: **Firebase Firestore**, **MongoDB**, or **PostgreSQL**.
+  - **Authentication:** Firebase Authentication or OAuth (Google/Facebook).
+  - **Push Notifications:** Use of **Push.js** or **Web Push Notifications** API for real-time alerts.
+
+- **App Design:**
+  - Fully responsive design that works across different web browsers (Chrome, Firefox, Safari, Edge).
+  - Adaptive layout for desktop, tablet, and mobile browsers (Progressive Web App [PWA] capabilities).
+
+#### **2. User Authentication & Profile Management**
+- **Account Creation:**
+  - Sign up and login options through **email**, **phone number**, or **social media (Google/Facebook)**.
+  - Email verification after sign-up, with **two-factor authentication** (2FA) for added security.
+
+- **User Profile:**
+  - Profile creation with **username**, **bio**, **profile picture**, and **account privacy settings**.
+  - Option to **edit profile** and manage privacy settings, including **email** or **phone number visibility**.
+  
+- **Follow/Unfollow:**
+  - Ability to follow or unfollow users directly from their profiles, and interact with their feeds.
+
+#### **3. Content Posting & Interaction**
+- **Post Creation:**
+  - Upload photos, videos, or text-based posts with captions, tags, and **geolocation**.
+  - Option to add **filters**, **crop images**, and add custom **sticker overlays**.
+
+- **Post Engagement:**
+  - Like, comment, and share functionalities for posts.
+  - Users can **save** posts to a personal collection and **share** them on other platforms or externally.
+  
+- **Stories Feature:**
+  - Users can post **ephemeral stories** with the option to add **text, drawings**, and **interactive stickers**.
+  - Viewers can see who has **watched** a story.
+
+#### **4. Explore & Search Features**
+- **Search Functionality:**
+  - Search bar that allows users to search for **users**, **posts**, and **hashtags**.
+  - Filter content based on **location**, **category**, or **popularity**.
+  
+- **Explore Page:**
+  - **Personalized content feed** that suggests **trending** or **popular posts** based on user preferences.
+  - Option to explore **hashtag feeds** and discover posts within specific topics.
+
+#### **5. Direct Messaging & Notifications**
+- **Direct Messaging:**
+  - Real-time **private messaging** functionality.
+  - Users can create **group chats**, share media, and interact via **reactions** and **mentions**.
+  - **Message search** and **message threads** within conversations.
+
+- **Notifications:**
+  - **Web Push Notifications** for new likes, comments, direct messages, and follows.
+  - In-app **notification center** for users to view their recent interactions.
+  - Customizable notification preferences, allowing users to toggle different notification types on or off.
+
+#### **6. Challenges & Dare System**
+- **Challenge Creation & Participation:**
+  - Users can create and participate in challenges by posting images/videos as proof.
+  - **Dare feed** that shows the **latest** and **most popular challenges**.
+  
+- **Challenge Voting:**
+  - After completing a dare, users can rate or react to others' submissions (e.g., **like**, **comment**, or **vote** on creativity).
+  - **Trending challenges** based on participation and reactions.
+
+#### **7. Privacy & Security**
+- **Account Privacy:**
+  - Option for **private** or **public profiles**, where users can accept or reject follow requests.
+  - Blocking and reporting capabilities for users to block others and report inappropriate content.
+
+- **Data Security:**
+  - **End-to-end encryption** for messages.
+  - Use secure cloud storage for media (Amazon S3 or Google Cloud Storage).
+  - Regular **data backups** and compliance with **GDPR** and other privacy regulations.
+
+#### **8. Monetization (Optional)**
+- **In-app Purchases:**
+  - Premium features, such as **exclusive dares** or additional **filters** and **stickers**.
+  - Paid badges or special icons for users to distinguish themselves in the community.
+
+- **Advertisements:**
+  - Integration of **native ads** in the feed (e.g., sponsored posts).
+  - Option to run **ad campaigns** for user or brand promotions.
+
+- **Subscription Model:**
+  - Monthly or yearly subscription for **ad-free experience**, access to **premium content**, or advanced **analytics** for posts.
+
+#### **9. Admin Panel**
+- **Content Moderation:**
+  - Admin tools for flagging and **removing inappropriate content**, including posts, comments, and user reports.
+  
+- **User Management:**
+  - Manage user accounts, including **suspending** or **deleting** accounts, enforcing privacy violations, and reviewing reports.
+
+- **Analytics Dashboard:**
+  - Admin panel for tracking **user growth**, **engagement metrics**, and **challenge performance**.
+  - Visualizations of **user activity**, **popular content**, and **engagement** across different demographics.
+
+#### **10. Analytics & Insights (Optional)**
+- **User Analytics:**
+  - Users can access insights on post **engagement**, **reach**, **comments**, and **follower growth**.
+  - **Profile analytics** showing trends in followers, comments, and likes over time.
+
+- **Content Performance:**
+  - Track post performance, identify **top-performing content**, and measure the success of challenges.
+  - **Heatmaps** or **graphs** showing which types of posts (images/videos/stories) are most engaging.
+

@@ -9,7 +9,7 @@ from streamlit_lottie import st_lottie
 import requests
 import json
 from database import init_db, create_user, authenticate_user, check_username_exists
-from pages import show_home_page, show_search_page, show_add_post, show_stream_page, show_profile_page
+from pages import show_home_page, show_search_page, show_add_post, show_stream_page, show_profile_page, show_messages_page, show_stories_page, show_challenges_page
 
 # Configure Streamlit page
 st.set_page_config(
@@ -147,12 +147,20 @@ def show_main_app():
     # Horizontal menu
     selected = option_menu(
         menu_title=None,
-        options=["Home", "Search", "Add Post", "Stream", "Profile"],
-        icons=["house", "search", "plus-circle", "collection-play", "person"],
+        options=["Home", "Search", "Add Post", "Stories", "Messages", 
+                "Challenges", "Profile"],
+        icons=["house", "search", "plus-circle", "camera", "chat", 
+               "trophy", "person"],
         orientation="horizontal",
     )
     
-    if selected == "Home":
+    if selected == "Challenges":
+        show_challenges_page()
+    elif selected == "Messages":
+        show_messages_page()
+    elif selected == "Stories":
+        show_stories_page()
+    elif selected == "Home":
         show_home_page()
     elif selected == "Search":
         show_search_page()
