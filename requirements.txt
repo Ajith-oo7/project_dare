@@ -15,9 +15,4 @@ streamlit-cropper==0.1.3
 plotly==5.18.0
 
 # Image Processing
-opencv-python==4.9.0.80
-
-# Messaging dependencies
-slixmpp==1.8.3
-aioxmpp==0.13.3
-asyncio==3.4.3 
+opencv-python==4.9.0.80 
