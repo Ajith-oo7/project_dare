@@ -66,7 +66,8 @@ def show_home_page():
             col1, col2 = st.columns([3, 1])
             with col1:
                 try:
-                    file_path = os.path.join(os.getcwd(), post['video_path'])
+                    # Convert path separators to forward slashes
+                    file_path = post['video_path'].replace('\\', '/')
                     if os.path.exists(file_path):
                         if post['media_type'] == 'image':
                             with open(file_path, 'rb') as f:
@@ -75,7 +76,7 @@ def show_home_page():
                         else:
                             st.video(file_path)
                     else:
-                        st.warning(f"Media not available: {file_path}")
+                        st.warning(f"Media not available")
                 except Exception as e:
                     st.error(f"Error displaying media: {str(e)}")
                     
@@ -177,8 +178,8 @@ def show_add_post():
             file_extension = os.path.splitext(uploaded_file.name)[1]
             filename = f"{st.session_state.username}_{timestamp}{file_extension}"
             
-            # Save to posts directory
-            file_path = os.path.join("uploads", "posts", filename)
+            # Save to posts directory with forward slashes
+            file_path = "uploads/posts/" + filename
             
             with open(file_path, "wb") as f:
                 f.write(uploaded_file.getbuffer())
@@ -186,6 +187,7 @@ def show_add_post():
             # Show preview
             st.image(file_path, caption="Preview", width=200)
             
+            caption = st.text_area("Caption")
             if st.button("Submit Post"):
                 create_post(st.session_state.user_id, file_path, caption)
                 st.success("Post created!")
