@@ -60,10 +60,21 @@ def show_home_page():
             col1, col2 = st.columns([3, 1])
             with col1:
                 # Display media based on type
-                if post['media_type'] == 'image':
-                    st.image(post['video_path'], width=300)  # Smaller image size
-                else:
-                    st.video(post['video_path'])
+                try:
+                    if post['media_type'] == 'image':
+                        if os.path.exists(post['video_path']):
+                            with open(post['video_path'], 'rb') as f:
+                                image_bytes = f.read()
+                            st.image(image_bytes, width=300)
+                        else:
+                            st.warning("Image not available")
+                    else:
+                        if os.path.exists(post['video_path']):
+                            st.video(post['video_path'])
+                        else:
+                            st.warning("Video not available")
+                except Exception as e:
+                    st.error(f"Error displaying media: {str(e)}")
                     
                 st.write(f"Posted by: {post['username']}")
                 st.write(post['caption'])
