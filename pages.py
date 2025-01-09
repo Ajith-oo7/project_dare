@@ -17,8 +17,14 @@ from xmpp_handler import XMPPManager
 # Initialize XMPP manager
 xmpp_manager = XMPPManager()
 
+def ensure_upload_dirs():
+    for path in ['uploads/posts', 'uploads/stories', 'uploads/challenges']:
+        os.makedirs(path, exist_ok=True)
+
 # Implementation of individual pages
 def show_home_page():
+    ensure_upload_dirs()
+    
     st.title("Home")
     
     # Show active stories
@@ -59,20 +65,17 @@ def show_home_page():
         with st.container():
             col1, col2 = st.columns([3, 1])
             with col1:
-                # Display media based on type
                 try:
-                    if post['media_type'] == 'image':
-                        if os.path.exists(post['video_path']):
-                            with open(post['video_path'], 'rb') as f:
+                    file_path = os.path.join(os.getcwd(), post['video_path'])
+                    if os.path.exists(file_path):
+                        if post['media_type'] == 'image':
+                            with open(file_path, 'rb') as f:
                                 image_bytes = f.read()
                             st.image(image_bytes, width=300)
                         else:
-                            st.warning("Image not available")
+                            st.video(file_path)
                     else:
-                        if os.path.exists(post['video_path']):
-                            st.video(post['video_path'])
-                        else:
-                            st.warning("Video not available")
+                        st.warning(f"Media not available: {file_path}")
                 except Exception as e:
                     st.error(f"Error displaying media: {str(e)}")
                     
@@ -163,18 +166,31 @@ def show_user_profile(user_id):
 def show_add_post():
     st.title("Create New Post")
     
-    # Add tabs for different media types
     media_type = st.radio("Select media type:", ["Image", "Video"])
     
     if media_type == "Image":
         uploaded_file = st.file_uploader("Upload Image", 
                                        type=['png', 'jpg', 'jpeg', 'gif'])
         if uploaded_file:
-            # Smaller preview
-            st.image(uploaded_file, caption="Preview", width=200)
-        
-        caption = st.text_area("Caption")
-        
+            # Generate unique filename
+            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+            file_extension = os.path.splitext(uploaded_file.name)[1]
+            filename = f"{st.session_state.username}_{timestamp}{file_extension}"
+            
+            # Save to posts directory
+            file_path = os.path.join("uploads", "posts", filename)
+            
+            with open(file_path, "wb") as f:
+                f.write(uploaded_file.getbuffer())
+            
+            # Show preview
+            st.image(file_path, caption="Preview", width=200)
+            
+            if st.button("Submit Post"):
+                create_post(st.session_state.user_id, file_path, caption)
+                st.success("Post created!")
+                st.rerun()
+
     else:  # Video
         uploaded_file = st.file_uploader("Upload Video", 
                                        type=['mp4', 'mov', 'avi'])
