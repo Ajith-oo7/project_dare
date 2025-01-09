@@ -9,7 +9,15 @@ from streamlit_lottie import st_lottie
 import requests
 import json
 from database import init_db, create_user, authenticate_user, check_username_exists
-from pages import show_home_page, show_search_page, show_add_post, show_stream_page, show_profile_page, show_messages_page, show_stories_page, show_challenges_page
+from pages import (
+    show_home_page, 
+    show_search_page, 
+    show_add_post, 
+    show_profile_page, 
+    show_messages_page, 
+    show_stories_page, 
+    show_challenges_page
+)
 
 # Configure Streamlit page
 st.set_page_config(
@@ -166,8 +174,6 @@ def show_main_app():
         show_search_page()
     elif selected == "Add Post":
         show_add_post()
-    elif selected == "Stream":
-        show_stream_page()
     elif selected == "Profile":
         show_profile_page()
 
