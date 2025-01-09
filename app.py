@@ -10,7 +10,11 @@ from database import init_db, create_user, authenticate_user, check_username_exi
 # Import only essential functions first
 from pages import (
     show_home_page,
+    show_search_page,
+    show_add_post,
+    show_stories_page,
     show_messages_page,
+    show_challenges_page,
     show_profile_page
 )
 
@@ -63,18 +67,56 @@ def show_login_page():
                 st.error("Username or email already exists!")
 
 def show_main_app():
-    # Simplified menu first
+    # Full navigation menu with all features
     selected = option_menu(
         menu_title=None,
-        options=["Home", "Messages", "Profile"],
-        icons=["house", "chat", "person"],
+        options=[
+            "Home", 
+            "Search", 
+            "Add Post", 
+            "Stories",
+            "Messages", 
+            "Challenges",
+            "Profile"
+        ],
+        icons=[
+            "house", 
+            "search", 
+            "plus-circle", 
+            "camera",
+            "chat", 
+            "trophy",
+            "person"
+        ],
+        menu_icon="cast",
+        default_index=0,
         orientation="horizontal",
+        styles={
+            "container": {"padding": "0!important", "background-color": "#1a1c1f"},
+            "icon": {"color": "white", "font-size": "20px"}, 
+            "nav-link": {
+                "color": "white",
+                "font-size": "14px",
+                "text-align": "center",
+                "margin": "0px",
+                "--hover-color": "#ff4b4b"
+            },
+            "nav-link-selected": {"background-color": "#ff4b4b"},
+        }
     )
     
     if selected == "Home":
         show_home_page()
+    elif selected == "Search":
+        show_search_page()
+    elif selected == "Add Post":
+        show_add_post()
+    elif selected == "Stories":
+        show_stories_page()
     elif selected == "Messages":
         show_messages_page()
+    elif selected == "Challenges":
+        show_challenges_page()
     elif selected == "Profile":
         show_profile_page()
 
